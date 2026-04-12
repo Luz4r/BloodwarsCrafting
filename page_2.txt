@@ -1,6 +1,0 @@
-slonca	wieszcza	kary	kary	gladiatora	gladiatora	krwi	krwi	skorupy zolwia	skorupy zolwia	slonca	slonca	adrenaliny	slonca	prekognicji	prekognicji	smoczej luski	smoczej luski	mocy
-adrenaliny	kary	kary	gladiatora	gladiatora	krwi	krwi	skorupy zolwia	skorupy zolwia	slonca	slonca	adrenaliny	adrenaliny	prekognicji	adrenaliny	smoczej luski	smoczej luski	mocy	mocy
-prekognicji	kary	gladiatora	gladiatora	krwi	krwi	skorupy zolwia	skorupy zolwia	slonca	slonca	adrenaliny	adrenaliny	prekognicji	prekognicji	smoczej luski	prekognicji	mocy	mocy	magii
-smoczej luski	gladiatora	gladiatora	krwi	krwi	skorupy zolwia	skorupy zolwia	slonca	slonca	adrenaliny	adrenaliny	prekognicji	prekognicji	smoczej luski	smoczej luski	mocy	smoczej luski	magii	mocy
-mocy	gladiatora	krwi	krwi	skorupy zolwia	skorupy zolwia	slonca	slonca	adrenaliny	adrenaliny	prekognicji	prekognicji	smoczej luski	smoczej luski	mocy	mocy	magii	mocy	smoczej luski
-magii	krwi	krwi	skorupy zolwia	skorupy zolwia	slonca	slonca	adrenaliny	adrenaliny	prekognicji	prekognicji	smoczej luski	smoczej luski	mocy	mocy	magii	mocy	smoczej luski	magii
