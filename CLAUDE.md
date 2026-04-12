@@ -68,6 +68,22 @@ CATEGORIES = {
 Matrices are symmetric lookup tables: `matrix[A][B]` gives the result of combining A with B.
 `LABELS` maps internal keys (ASCII) to Polish display strings with diacritics.
 
+## Crafting Rules (Game Mechanics)
+
+**Prefix/suffix only appear in the result if BOTH input items have that component.**
+- Item A has prefix only + Item B has prefix and suffix → result has prefix, **no suffix**
+- Item A has no prefix + Item B has prefix → result has **no prefix**
+- Each component (type, prefix, suffix) is evaluated independently
+
+**How this is implemented throughout the codebase:**
+- `__any__` is the sentinel value for "item has no prefix/suffix" (shown as `(brak)` in UI)
+- Every tab checks `aPrefix !== '__any__' && bPrefix !== '__any__'` before matrix lookup
+- If either item is `__any__`, the result component is `null` and that section is skipped entirely
+- The data matrices themselves contain no row/column for "no prefix" — absence is implicit
+- This rule is enforced at every level: forward, craft, path, reverse, and BFS
+
+**When adding new features that involve prefix/suffix logic**, always gate matrix lookups with the same `!== '__any__'` double-check on both inputs. Never fall through to the matrix with a missing component.
+
 ## Key Patterns
 
 **Window-exposed functions** — HTML uses `onclick="fnName()"` attributes. All callable functions must be assigned to `window.*` in `main.js`. Never use module-scoped functions directly in HTML.
