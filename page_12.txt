@@ -1,0 +1,16 @@
+palna 1h	glock	beretta	uzi	magnum	desert eagle	mp5k	skorpion
+glock	glock	uzi	uzi	magnum	magnum	desert eagle	desert eagle
+beretta	uzi	beretta	magnum	magnum	desert eagle	desert eagle	mp5k
+uzi	uzi	magnum	uzi	desert eagle	desert eagle	mp5k	mp5k
+magnum	magnum	magnum	desert eagle	magnum	mp5k	mp5k	skorpion
+desert eagle	magnum	desert eagle	desert eagle	mp5k	desert eagle	skorpion	mp5k
+mp5k	desert eagle	desert eagle	mp5k	mp5k	skorpion	mp5k	desert eagle
+skorpion	desert eagle	mp5k	mp5k	skorpion	mp5k	desert eagle	skorpion
+palna 2h	karabin m.	polautomat s.	karabin s.	ak-47	fn-fal	strzelba	miotacz p.
+karabin m.	karabin m.	karabin s.	karabin s.	ak-47	ak-47	fn-fal	fn-fal
+polautomat s.	karabin s.	polautomat s.	ak-47	ak-47	fn-fal	fn-fal	strzelba
+karabin s.	karabin s.	ak-47	karabin s.	fn-fal	fn-fal	strzelba	strzelba
+ak-47	ak-47	ak-47	fn-fal	ak-47	strzelba	strzelba	miotacz p.
+fn-fal	ak-47	fn-fal	fn-fal	strzelba	fn-fal	miotacz p.	strzelba
+strzelba	fn-fal	fn-fal	strzelba	strzelba	miotacz p.	strzelba	fn-fal
+miotacz p.	fn-fal	strzelba	strzelba	miotacz p.	strzelba	fn-fal	miotacz p.

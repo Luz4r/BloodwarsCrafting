@@ -1,0 +1,48 @@
+zbroja	koszulka	kurtka	marynarka	kamizelka	gorset	peleryna	smoking	kolczuga	zbroja warstwowa	pelna zbroja
+koszulka	koszulka	marynarka	marynarka	kamizelka	kamizelka	gorset	gorset	peleryna	peleryna	smoking
+kurtka	marynarka	kurtka	kamizelka	kamizelka	gorset	gorset	peleryna	peleryna	smoking	smoking
+marynarka	marynarka	kamizelka	marynarka	gorset	gorset	peleryna	peleryna	smoking	smoking	kolczuga
+kamizelka	kamizelka	kamizelka	gorset	kamizelka	peleryna	peleryna	smoking	smoking	kolczuga	kolczuga
+gorset	kamizelka	gorset	gorset	peleryna	gorset	smoking	smoking	kolczuga	kolczuga	zbroja warstwowa
+peleryna	gorset	gorset	peleryna	peleryna	smoking	peleryna	kolczuga	kolczuga	zbroja warstwowa	zbroja warstwowa
+smoking	gorset	peleryna	peleryna	smoking	smoking	kolczuga	smoking	zbroja warstwowa	zbroja warstwowa	pełna zbroja
+kolczuga	peleryna	peleryna	smoking	smoking	kolczuga	kolczuga	zbroja warstwowa	kolczuga	pelna zbroja	zbroja warstwowa
+zbroja warstwowa	peleryna	smoking	smoking	kolczuga	kolczuga	zbroja warstwowa	zbroja warstwowa	pelna zbroja	zbroja warstwowa	kolczuga
+pelna zbroja	smoking	smoking	kolczuga	kolczuga	zbroja warstwowa	zbroja warstwowa	pelna zbroja	zbroja warstwowa	kolczuga	pelna zbroja
+zbroja pref	wzmocniony	cwiekowana	wladczy	lekki	luskowy	bojowy	plytowy	gietki	krwawy	lowiecki	szamanski	kuloodporny	tygrysi	elfi	runiczny	smiercionosny
+wzmocniony	wzmocniony	wladczy	wladczy	lekki	lekki	luskowy	luskowy	bojowy	bojowy	plytowy	pytowy	gietki	gietki	krwawy	krwawy	lowiecki
+cwiekowany	wladczy	cwiekowany	lekki	lekki	luskowy	luskowy	bojowy	bojowy	plytowy	plytowy	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki
+wladczy	wladczy	lekki	wladczy	luskowy	luskowy	bojowy	bojowy	plytowy	plytowy	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski
+lekki	lekki	lekki	luskowy	lekki	bojowy	bojowy	plytowy	plytowy	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski	szamanski
+luskowy	lekki	luskowy	luskowy	bojowy	luskowy	plytowy	plytowy	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski	szamanski	kuloodporny
+bojowy	luskowy	luskowy	bojowy	bojowy	plytowy	bojowy	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski	szamanski	kuloodporny	kuloodporny
+plytowy	luskowy	bojowy	bojowy	plytowy	plytowy	gietki	plytowy	krwawy	krwawy	lowiecki	lowiecki	szamanski	szamanski	kuloodporny	kuloodporny	tygrysi
+gietki	bojowy	bojowy	plytowy	plytowy	gietki	gietki	krwawy	gietki	lowiecki	lowiecki	szamasnki	szamanski	kuloodporny	kuloodporny	tygrysi	tygrysi
+krwawy	bojowy	plytowy	plytowy	gietki	gietki	krwawy	krwawy	lowiecki	krwawy	szamanski	szamasnki	kuloodporny	kuloodporny	tygrysi	tygrysi	elfi
+lowiecki	plytowy	plytowy	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski	lowiecki	kuloodporny	kuloodporny	tygrysi	tygrysi	elfi	elfi
+szamanski	plytowy	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski	szamanski	kuloodporny	szamanski	tygrysi	tygrysi	elfi	elfi	runiczny
+kuloodporny	gietki	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski	szmanski	kuloodporny	kuloodporny	tygrysi	kuloodporny	elfi	elfi	runiczny	runiczny
+tygrysi	gietki	krwawy	krwawy	lowiecki	lowiecki	szamanski	szamanski	kuloodporny	kuloodporny	tygrysi	tygrysi	elfi	tygrysi	runiczny	runiczny	smiercionosny
+elfi	krwawy	krwawy	lowiecki	lowiecki	szamanski	szamanski	kuloodporny	kuloodporny	tygrysi	tygrysi	elfi	elfi	runiczny	elfi	smiercionosny	runiczny
+runiczny	krwawy	lowiecki	lowiecki	szamanski	szamanski	kuloodporny	kuloodporny	tygrysi	tygrysi	elfi	elfi	runiczny	runiczny	smiercionosny	runiczny	elfi
+smiercionosny	lowiecki	lowiecki	szamanski	szamanski	kuloodporny	kuloodporny	tygrysi	tygrysi	elfi	elfi	runiczny	runiczny	smiercionosny	runiczny	elfi	smiercionosny
+zbroja suf	adepta	straznika	zlodzieja	silacza	narkomana	szermierza	zabojcy	gwardzisty	kobry	skorupy zolwia	unikow	grabiezcy	mistrza	adrenainy	centuriona	odpornosci	kaliguli	siewcy smierci	szybkosci	orchidei
+adepta	adepta	zlodzieja	zjodzieja	silacza	silacza	narkomana	narkomana	szermierza	szermierza	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zowlia	skorupy zolwia	unikow	unikow	grabiezcy
+straznika	zlodzieja	straznika	silacza	silacza	narkomana	narkomana	szermierza	szermierza	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zowlia	unikow	unikow	grabiezcy	grabiezcy
+zlodzieja	zlodzieja	silacza	zlodzija	narkomana	narkomana	szermierza	szermierza	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza
+silacza	silacza	silacza	narkomana	silacza	szermierza	szermierza	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza
+narkomana	silacza	narkomana	narkomana	szermierza	narkomana	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny
+szermierza	narkomana	narkomana	szermierza	szermierza	zabojcy	szermierza	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny
+zabojcy	narkomana	szermierza	szermierza	zabojcy	zabojcy	gwardzisty	zabojcy	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona
+gwardzisty	szermierza	szermierza	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	gwardzisty	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona
+kobry	szermierza	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	kobry	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona	odpornosci
+skorupy zolwia	zabojcy	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	skorupy zolwia	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona	odpornosci	odpornosci
+unikow	zabojcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	unikow	mistrza	mistrza	adrenainy	adrenaliny	centuriona	centuriona	odpornosci	odpornosci	kaliguli
+grabiezcy	gwardzisty	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	grabiezcy	adrenaliny	adrenainy	centuriona	centuriona	odpornosci	odpornosci	kaliguli	kaliguli
+mistrza	gwardzisty	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabierzcy	grabiezcy	mistrza	mistrza	adrenaliny	mistrza	centuriona	centuriona	odpornosci	odpornosci	kaliguli	kaliguli	siewcy smierci
+adrenaliny	kobry	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabierzcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	adrenainy	odpornosci	odpornosci	kaliguli	kaliguli	siewcy smierci siewcy smierci
+centuriona	kobry	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona	odpornosci	centuriona	kaliguli	kaliguli	siewcy smierci siewcy smierci	szybkosci
+odpornosci	skorupy zolwia	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona	odpornosci	odpornosci	kaliguli	odpornosci	siewcy smierci	siewcy smierci	szybkosci	szybkosci
+kaliguli	skorupy zolwia	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona	odpornosci	odpornosci	kaliguli	kaliguli	siewcy smierci	kaliguli	szybkosci	szybkosci	orchidei
+siewcy smierci	unikow	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona	odpornosci	odpornosci	kaliguli	kaliguli	siewcy smierci	siewcy smierci	szybkosci	siewcy smierci	orchidei	szybkosci
+szybkosci	unikow	grabiezcy	grabiezcy	mistrza	mistrza	adrenaliny	adrenaliny	centuriona	centuriona	odpornosci	odpornosci	kaliguli	kaliguli	siewcy smierci	siewcy smierci	szybkosci	szybkosci	orchidei	szybkosci	siewcy smierci
