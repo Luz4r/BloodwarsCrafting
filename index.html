@@ -62,6 +62,7 @@
     <button class="tab-btn active" onclick="switchTab('reverse')">🔍 Szukaj Składników</button>
     <button class="tab-btn" onclick="switchTab('forward')">⚗ Wynik Łączenia</button>
     <button class="tab-btn" onclick="switchTab('path')">🗺 Ścieżka Wytwarzania</button>
+    <button class="tab-btn" onclick="switchTab('craft')">🎒 Moje Kombinacje</button>
   </div>
 
   <div class="card" style="border-radius:0 8px 8px 8px; border-top-color:#c9952a;">
@@ -152,6 +153,27 @@
       </div>
 
       <div id="path-result" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- ===== CRAFT TAB ===== -->
+    <div id="tab-craft" class="tab-content">
+      <h2>Moje Kombinacje</h2>
+      <p class="text-sm mb-4" style="color:#888;">Wybierz swój przedmiot — zobaczysz co możesz uzyskać łącząc go z każdym możliwym partnerem.</p>
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div id="craft-type-wrap">
+          <label>Typ</label><br>
+          <select id="craft-type" onchange="doCraft()"></select>
+        </div>
+        <div id="craft-prefix-wrap">
+          <label>Prefiks</label><br>
+          <select id="craft-prefix" onchange="doCraft()"></select>
+        </div>
+        <div id="craft-suffix-wrap">
+          <label>Sufiks</label><br>
+          <select id="craft-suffix" onchange="doCraft()"></select>
+        </div>
+      </div>
+      <div id="craft-results"></div>
     </div>
 
   </div>
@@ -330,6 +352,7 @@ function onCatChange() {
   doReverse();
   doForward();
   doPath();
+  doCraft();
 }
 
 function rebuildAllSelects() {
@@ -375,6 +398,13 @@ function rebuildAllSelects() {
     populateSelect('path-a-suffix', cat.suffixes, true, '(brak)');
     populateSelect('path-b-suffix', cat.suffixes, true, '(brak)');
   }
+
+  // Craft tab
+  populateSelect('craft-type', cat.subtypes, false);
+  showEl('craft-prefix-wrap', hasPref);
+  showEl('craft-suffix-wrap', hasSuff);
+  if (hasPref) populateSelect('craft-prefix', cat.prefixes, true, '(dowolny prefiks)');
+  if (hasSuff) populateSelect('craft-suffix', cat.suffixes, true, '(dowolny sufiks)');
 }
 
 // ===== REVERSE =====
@@ -538,6 +568,70 @@ function renderPathSection(attrName, start, target, paths) {
   return h;
 }
 
+// ===== CRAFT =====
+function doCraft() {
+  const cat = getCat();
+  const myType = document.getElementById('craft-type').value;
+  const myPrefix = cat.prefixes ? document.getElementById('craft-prefix').value : '__any__';
+  const mySuffix = cat.suffixes ? document.getElementById('craft-suffix').value : '__any__';
+
+  let html = '';
+
+  // Type: for each partner type, what result do I get?
+  {
+    const byResult = {};
+    for (const partner of cat.subtypes) {
+      const result = cat.typeMatrix[myType] && cat.typeMatrix[myType][partner];
+      if (!result) continue;
+      if (!byResult[result]) byResult[result] = [];
+      byResult[result].push(partner);
+    }
+    html += renderCraftSection('Typ: ' + lbl(myType), byResult);
+  }
+
+  // Prefix
+  if (cat.prefixes && myPrefix !== '__any__') {
+    const byResult = {};
+    for (const partner of cat.prefixes) {
+      const result = cat.prefixMatrix[myPrefix] && cat.prefixMatrix[myPrefix][partner];
+      if (!result) continue;
+      if (!byResult[result]) byResult[result] = [];
+      byResult[result].push(partner);
+    }
+    html += renderCraftSection('Prefiks: ' + lbl(myPrefix), byResult);
+  }
+
+  // Suffix
+  if (cat.suffixes && mySuffix !== '__any__') {
+    const byResult = {};
+    for (const partner of cat.suffixes) {
+      const result = cat.suffixMatrix[mySuffix] && cat.suffixMatrix[mySuffix][partner];
+      if (!result) continue;
+      if (!byResult[result]) byResult[result] = [];
+      byResult[result].push(partner);
+    }
+    html += renderCraftSection('Sufiks: ' + lbl(mySuffix), byResult);
+  }
+
+  document.getElementById('craft-results').innerHTML = html || '<p style="color:#888">Brak wyników.</p>';
+}
+
+function renderCraftSection(title, byResult) {
+  let h = `<div class="attr-section"><div class="attr-label">${title}</div>`;
+  const results = Object.keys(byResult);
+  if (results.length === 0) {
+    h += '<p style="color:#888;font-size:0.9em;">Brak kombinacji.</p></div>';
+    return h;
+  }
+  h += '<table><thead><tr><th>Wynik</th><th>Połącz z (partner)</th></tr></thead><tbody>';
+  for (const result of results) {
+    const partners = byResult[result];
+    h += `<tr><td><span class="result-badge">${lbl(result)}</span></td><td>${partners.map(p => lbl(p)).join(', ')}</td></tr>`;
+  }
+  h += '</tbody></table></div>';
+  return h;
+}
+
 // Tab switching
 function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -547,6 +641,7 @@ function switchTab(name) {
   if (name === 'reverse') doReverse();
   else if (name === 'forward') doForward();
   else if (name === 'path') doPath();
+  else if (name === 'craft') doCraft();
 }
 
 // Init
@@ -555,6 +650,7 @@ renderBlockedUI();
 doReverse();
 doForward();
 doPath();
+doCraft();
 </script>
 </body>
 </html>
