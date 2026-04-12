@@ -24,3 +24,37 @@ h2 { color:#c9952a; border-bottom:1px solid #3a2a10; padding-bottom:6px; margin-
 .attr-label { color:#c9952a; font-size:0.85em; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
 label { color:#a07030; font-size:0.9em; }
 .pairs-count { color:#888; font-size:0.85em; margin-bottom:8px; }
+
+/* ── Drill-down styles ── */
+.drill-chip { display:inline-block; background:#1f1a0a; border:1px solid #5a3e1b; border-radius:4px; padding:2px 8px; cursor:pointer; transition:border-color 0.15s, background 0.15s; }
+.drill-chip:hover { border-color:#c9952a; background:#2a1f08; color:#f5d78e; }
+
+.drill-attr-block { margin-bottom:24px; }
+
+.drill-breadcrumb { display:flex; align-items:center; flex-wrap:wrap; gap:2px; margin-bottom:10px; font-size:0.85em; }
+.drill-crumb { padding:2px 10px; border-radius:4px; border:1px solid #3a2a10; }
+.drill-crumb-ancestor { background:#1a1a1a; color:#c9952a; cursor:pointer; }
+.drill-crumb-ancestor:hover { border-color:#c9952a; background:#2a1f08; }
+.drill-crumb-current { background:#2a1f08; border-color:#c9952a; color:#f5d78e; font-weight:bold; }
+.drill-crumb-sep { color:#5a3e1b; }
+
+.drill-sub-section { border-left:3px solid #5a3e1b; padding-left:14px; margin-left:6px; }
+
+.drill-popover { background:#1a1a1a; border:1px solid #c9952a; border-radius:6px; padding:10px; z-index:1000; min-width:220px; box-shadow:0 4px 20px rgba(0,0,0,0.7); }
+.drill-popover-title { color:#a07030; font-size:0.78em; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.drill-popover-btn { display:block; width:100%; text-align:left; margin-bottom:5px; padding:5px 10px; font-size:0.9em; }
+.drill-popover-btn:last-child { margin-bottom:0; }
+.drill-popover-btn:hover { background:#2a1f08; border-color:#c9952a; }
+.drill-popover-btn-both { border-color:#4a7a4a; color:#7ec87e; }
+.drill-popover-btn-both:hover { background:#1a2a1a; border-color:#7ec87e; }
+
+/* ── Drill graph (SVG tree) ── */
+.tg-scroll { overflow-x:auto; }
+.tg-section { }
+.tg-edge { fill:none; stroke:#5a3e1b; stroke-width:1.5; }
+.tg-node rect { stroke-width:1.5; }
+.tg-node text { fill:#e5c97a; font-size:12px; font-family:'Segoe UI',sans-serif; pointer-events:none; }
+.tg-root rect  { fill:#2a1f08; stroke:#c9952a; stroke-width:2; }
+.tg-mid  rect  { fill:#1a1a1a; stroke:#7a5c2a; }
+.tg-leaf rect  { fill:#0f1f0f; stroke:#4a7a4a; stroke-width:2; }
+.tg-leaf text  { fill:#7ec87e; }

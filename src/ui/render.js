@@ -1,8 +1,11 @@
 import { lbl } from '../state.js';
 import { MAX_PATHS_DISPLAY } from '../lib/matrix.js';
 
-export function renderPairsSection(title, pairs, kind) {
-  let h = `<div class="attr-section"><div class="attr-label">${title}</div>`;
+export function renderPairsSection(title, pairs, kind, opts = {}) {
+  const { clickable = false, pathIndex = -1, isDrillSection = false } = opts;
+  const canDrill = clickable && (kind === 'pref' || kind === 'suf');
+
+  let h = `<div class="attr-section${isDrillSection ? ' drill-sub-section' : ''}"><div class="attr-label">${title}</div>`;
   if (pairs.length === 0) {
     h += '<p style="color:#888;font-size:0.9em;">Brak kombinacji.</p></div>';
     return h;
@@ -11,7 +14,15 @@ export function renderPairsSection(title, pairs, kind) {
   h += `<div class="pairs-count">${pairs.length} kombinacja(i)${pairs.length > 50 ? ' — pokazano pierwsze 50' : ''}</div>`;
   h += '<table><thead><tr><th>Składnik A</th><th>+</th><th>Składnik B</th></tr></thead><tbody>';
   for (const [a, b] of shown) {
-    h += `<tr><td>${lbl(a)}</td><td style="color:#c9952a;text-align:center">+</td><td>${lbl(b)}</td></tr>`;
+    if (canDrill) {
+      h += `<tr>
+        <td><span class="drill-chip" onclick="showDrillPopover(event,'${kind}',${pathIndex},'${a}','${b}')">${lbl(a)}</span></td>
+        <td style="color:#c9952a;text-align:center">+</td>
+        <td><span class="drill-chip" onclick="showDrillPopover(event,'${kind}',${pathIndex},'${a}','${b}')">${lbl(b)}</span></td>
+      </tr>`;
+    } else {
+      h += `<tr><td>${lbl(a)}</td><td style="color:#c9952a;text-align:center">+</td><td>${lbl(b)}</td></tr>`;
+    }
   }
   h += '</tbody></table></div>';
   return h;
