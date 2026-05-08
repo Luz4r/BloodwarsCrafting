@@ -190,6 +190,20 @@ function getLegendaryChoice() {
   return radio && radio.value === 'legendary';
 }
 
+function getAnyTypeChoice() {
+  const cb = document.getElementById('inv-any-type');
+  return !!(cb && cb.checked);
+}
+
+export function onAnyTypeChange() {
+  const checked = getAnyTypeChoice();
+  const sel = document.getElementById('inv-target-type');
+  if (sel) {
+    sel.disabled = checked;
+    sel.style.opacity = checked ? '0.4' : '';
+  }
+}
+
 let searchInFlight = false;
 
 export async function findInventoryPath() {
@@ -198,6 +212,7 @@ export async function findInventoryPath() {
   const hasPref = !!(cat.prefixes && cat.prefixes.length);
   const hasSuff = !!(cat.suffixes && cat.suffixes.length);
   const wantLegendary = getLegendaryChoice();
+  const anyType = getAnyTypeChoice();
 
   const target = {
     type: document.getElementById('inv-target-type').value,
@@ -231,9 +246,10 @@ export async function findInventoryPath() {
   searchInFlight = true;
 
   try {
-    const result = await findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth, timeoutMs: 6000 });
+    const result = await findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth, timeoutMs: 10000, anyType });
     if (resultEl) {
-      resultEl.innerHTML = banner + renderResult(result, target, inventoryForCat);
+      const displayTarget = result.target || target;
+      resultEl.innerHTML = banner + renderResult(result, displayTarget, inventoryForCat);
     }
   } catch (err) {
     if (resultEl) {

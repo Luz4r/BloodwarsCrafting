@@ -240,18 +240,25 @@ function solve(target, available, K, inventory, cat, ctx) {
   return null;
 }
 
-export async function findCraftPath({ cat, inventory, target, maxDepth = 5, timeoutMs = 6000 }) {
+// When anyType is true, target.type is ignored and any reachable item whose prefix/suffix
+// match the chosen ones counts as a valid result. The shortest such path wins.
+export async function findCraftPath({ cat, inventory, target, maxDepth = 5, timeoutMs = 6000, anyType = false }) {
   if (!inventory || inventory.length === 0) return { kind: 'no-inventory' };
 
-  // Fast path: target directly in inventory.
+  const matches = (item) => anyType
+    ? item.prefix === target.prefix && item.suffix === target.suffix
+    : sameItem(item, target);
+
+  // Fast path: a matching item is directly in inventory.
   for (let i = 0; i < inventory.length; i++) {
-    if (sameItem(inventory[i], target)) {
+    if (matches(inventory[i])) {
       return {
         kind: 'found',
         steps: [],
         consumed: [i],
         producedBy: { kind: 'inv', invIdx: i },
         depth: 0,
+        target: { type: inventory[i].type, prefix: target.prefix, suffix: target.suffix },
       };
     }
   }
@@ -264,7 +271,28 @@ export async function findCraftPath({ cat, inventory, target, maxDepth = 5, time
   const built = buildReachable(inventory, cat, deadline);
   if (built.timedOut) return { kind: 'timeout' };
   const reachable = built.capped ? null : built.set;
-  if (reachable && !reachable.has(itemKey(target))) return { kind: 'unreachable' };
+
+  // Build the concrete list of targets to try (one for non-anyType, many for anyType).
+  let targets;
+  if (anyType) {
+    if (reachable) {
+      const seen = new Set();
+      targets = [];
+      for (const item of reachable.values()) {
+        if (item.prefix === target.prefix && item.suffix === target.suffix && !seen.has(item.type)) {
+          seen.add(item.type);
+          targets.push({ type: item.type, prefix: target.prefix, suffix: target.suffix });
+        }
+      }
+      if (targets.length === 0) return { kind: 'unreachable' };
+    } else {
+      // Reachability was capped — fall back to all subtypes.
+      targets = cat.subtypes.map(t => ({ type: t, prefix: target.prefix, suffix: target.suffix }));
+    }
+  } else {
+    if (reachable && !reachable.has(itemKey(target))) return { kind: 'unreachable' };
+    targets = [target];
+  }
 
   // Build availSig if inventory size allows bitmask
   let availSig = null;
@@ -300,16 +328,20 @@ export async function findCraftPath({ cat, inventory, target, maxDepth = 5, time
 
   for (let K = 0; K <= maxDepth; K++) {
     if (Date.now() > deadline) return { kind: 'timeout' };
-    const res = solve(target, allAvailable, K, inventory, cat, ctx);
-    if (ctx.timedOut) return { kind: 'timeout' };
-    if (res) {
-      return {
-        kind: 'found',
-        steps: res.steps,
-        consumed: [...res.consumed],
-        producedBy: res.producedBy,
-        depth: K,
-      };
+    for (const t of targets) {
+      if (ctx.timedOut || Date.now() > deadline) return { kind: 'timeout' };
+      const res = solve(t, allAvailable, K, inventory, cat, ctx);
+      if (ctx.timedOut) return { kind: 'timeout' };
+      if (res) {
+        return {
+          kind: 'found',
+          steps: res.steps,
+          consumed: [...res.consumed],
+          producedBy: res.producedBy,
+          depth: K,
+          target: t,
+        };
+      }
     }
     // Yield between depth iterations so the page stays at least minimally responsive.
     await new Promise(r => setTimeout(r, 0));

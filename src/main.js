@@ -7,7 +7,7 @@ import { doReverse, refreshReverse, drillExtendPath, drillSplitPath, drillPathBa
 import { doForward } from './tabs/forward.js';
 import { doPath } from './tabs/path.js';
 import { doCraft } from './tabs/craft.js';
-import { doInventory, loadInventoryFromText, clearInventory, findInventoryPath, initInventory } from './tabs/inventory.js';
+import { doInventory, loadInventoryFromText, clearInventory, findInventoryPath, initInventory, onAnyTypeChange } from './tabs/inventory.js';
 
 // Expose functions on window so HTML onclick attributes work
 window.doReverse = doReverse;
@@ -18,6 +18,7 @@ window.doInventory = doInventory;
 window.loadInventoryFromText = loadInventoryFromText;
 window.clearInventory = clearInventory;
 window.findInventoryPath = findInventoryPath;
+window.onAnyTypeChange = onAnyTypeChange;
 
 window.drillExtendPath = drillExtendPath;
 window.drillSplitPath = drillSplitPath;

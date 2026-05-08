@@ -174,7 +174,13 @@
       <div class="card mb-4">
         <div class="attr-label mb-3">Przedmiot docelowy</div>
         <div class="flex flex-wrap gap-4 mb-3">
-          <div id="inv-target-type-wrap"><label>Typ</label><br><select id="inv-target-type"></select></div>
+          <div id="inv-target-type-wrap">
+            <label>Typ</label><br>
+            <select id="inv-target-type"></select>
+            <label style="display:block;margin-top:6px;font-size:0.8em;color:#a07030;cursor:pointer;">
+              <input type="checkbox" id="inv-any-type" onchange="onAnyTypeChange()"> Dowolny typ
+            </label>
+          </div>
           <div id="inv-target-prefix-wrap"><label>Prefiks</label><br><select id="inv-target-prefix"></select></div>
           <div id="inv-target-suffix-wrap"><label>Sufiks</label><br><select id="inv-target-suffix"></select></div>
           <div style="align-self:end;">
