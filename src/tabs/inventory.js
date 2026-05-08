@@ -48,9 +48,12 @@ function renderParsedSummary(items) {
   let html = `<details style="margin-top:6px;"><summary style="cursor:pointer;color:#a07030;font-size:0.85em;">Pokaż rozpoznane (${items.length})</summary>`;
   html += '<div style="margin-top:8px;">';
   for (const cat of Object.keys(byCat)) {
-    html += `<div style="margin-bottom:8px;"><span class="attr-label" style="display:inline-block;margin-right:8px;">${cat}</span><span style="color:#888;font-size:0.82em;">(${byCat[cat].length})</span><div style="margin-top:4px;">`;
+    const legCount = byCat[cat].filter(i => i.legendary).length;
+    const nrmCount = byCat[cat].length - legCount;
+    html += `<div style="margin-bottom:8px;"><span class="attr-label" style="display:inline-block;margin-right:8px;">${cat}</span><span style="color:#888;font-size:0.82em;">(${nrmCount} zwykłe, ${legCount} legendarne)</span><div style="margin-top:4px;">`;
     for (const item of byCat[cat]) {
-      html += `<div style="margin:2px 0;font-size:0.85em;color:#a07030;" title="${(item.raw || '').replace(/"/g, '&quot;')}">${itemDisplayName(item)}</div>`;
+      const tag = item.legendary ? '<span style="color:#d4a430;font-size:0.78em;margin-right:4px;">[L]</span>' : '';
+      html += `<div style="margin:2px 0;font-size:0.85em;color:${item.legendary ? '#d4a430' : '#a07030'};" title="${(item.raw || '').replace(/"/g, '&quot;')}">${tag}${itemDisplayName(item)}</div>`;
     }
     html += '</div></div>';
   }
@@ -141,8 +144,10 @@ function refreshDom() {
     if (parsedItems.length === 0) {
       statusEl.innerHTML = '<span style="color:#888;">Wklej tekst z gry i naciśnij Wczytaj.</span>';
     } else {
-      const inCat = parsedItems.filter(it => it.cat === currentCat).length;
-      statusEl.innerHTML = `<span style="color:#7ec87e;">Rozpoznano ${parsedItems.length} przedmiot(ów)</span> <span style="color:#888;">— w aktualnej kategorii (${cat.name}): ${inCat}</span>`;
+      const inCat = parsedItems.filter(it => it.cat === currentCat);
+      const leg = inCat.filter(i => i.legendary).length;
+      const nrm = inCat.length - leg;
+      statusEl.innerHTML = `<span style="color:#7ec87e;">Rozpoznano ${parsedItems.length} przedmiot(ów)</span> <span style="color:#888;">— w kategorii ${cat.name}: ${nrm} zwykłych, ${leg} legendarnych</span>`;
     }
   }
   if (detailEl) {
@@ -177,10 +182,16 @@ export function clearInventory() {
   refreshDom();
 }
 
+function getLegendaryChoice() {
+  const radio = document.querySelector('input[name="inv-legendary"]:checked');
+  return radio && radio.value === 'legendary';
+}
+
 export function findInventoryPath() {
   const cat = getCat();
   const hasPref = !!(cat.prefixes && cat.prefixes.length);
   const hasSuff = !!(cat.suffixes && cat.suffixes.length);
+  const wantLegendary = getLegendaryChoice();
 
   const target = {
     type: document.getElementById('inv-target-type').value,
@@ -189,7 +200,7 @@ export function findInventoryPath() {
   };
 
   const inventoryForCat = parsedItems
-    .filter(it => it.cat === currentCat)
+    .filter(it => it.cat === currentCat && !!it.legendary === wantLegendary)
     .map(it => ({ type: it.type, prefix: it.prefix, suffix: it.suffix, raw: it.raw }));
 
   const maxDepthEl = document.getElementById('inv-max-depth');
@@ -198,7 +209,13 @@ export function findInventoryPath() {
   const result = findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth });
   const resultEl = document.getElementById('inv-result');
   if (resultEl) {
-    resultEl.innerHTML = renderResult(result, target, inventoryForCat);
+    let banner = '';
+    if (wantLegendary) {
+      banner = `<div style="color:#d4a430;font-size:0.85em;margin-bottom:10px;">Tryb legendarny — wykorzystywane są tylko ${inventoryForCat.length} legendarne przedmioty z tej kategorii.</div>`;
+    } else {
+      banner = `<div style="color:#7a9a7a;font-size:0.85em;margin-bottom:10px;">Tryb zwykły — wykorzystywane są tylko ${inventoryForCat.length} zwykłe przedmioty z tej kategorii (legendarne pominięte).</div>`;
+    }
+    resultEl.innerHTML = banner + renderResult(result, target, inventoryForCat);
     resultEl.dataset.fresh = '1';
   }
 }

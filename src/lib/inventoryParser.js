@@ -15,6 +15,8 @@ const QUALITY_WORDS = new Set([
   'doskonaly', 'doskonala', 'doskonale',
 ]);
 
+const LEGENDARY_WORDS = new Set(['legendarny', 'legendarna', 'legendarne']);
+
 const NOISE_PATTERNS = [
   /^---$/,
   /^\d+\.(?:\s|$)/,
@@ -47,10 +49,14 @@ function stripEnchant(line) {
   return line.replace(/\s*\(\+\d+\)\s*$/, '').trim();
 }
 
-function stripQualityTokens(tokens) {
+function peelQualityTokens(tokens) {
   let i = 0;
-  while (i < tokens.length && QUALITY_WORDS.has(tokens[i])) i++;
-  return tokens.slice(i);
+  let legendary = false;
+  while (i < tokens.length && QUALITY_WORDS.has(tokens[i])) {
+    if (LEGENDARY_WORDS.has(tokens[i])) legendary = true;
+    i++;
+  }
+  return { tokens: tokens.slice(i), legendary };
 }
 
 // Find longest type match across all categories.
@@ -119,7 +125,8 @@ function parseLine(line) {
   if (!stripped) return null;
   const allTokens = tokenize(stripped);
   if (!allTokens.length) return null;
-  const tokens = stripQualityTokens(allTokens);
+  const peeled = peelQualityTokens(allTokens);
+  const tokens = peeled.tokens;
   if (!tokens.length) return null;
 
   const span = findTypeSpan(tokens);
@@ -153,6 +160,7 @@ function parseLine(line) {
     type: span.typeKey,
     prefix,
     suffix,
+    legendary: peeled.legendary,
     raw: line.trim(),
   };
 }

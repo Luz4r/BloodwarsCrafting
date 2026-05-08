@@ -173,7 +173,7 @@
 
       <div class="card mb-4">
         <div class="attr-label mb-3">Przedmiot docelowy</div>
-        <div class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap gap-4 mb-3">
           <div id="inv-target-type-wrap"><label>Typ</label><br><select id="inv-target-type"></select></div>
           <div id="inv-target-prefix-wrap"><label>Prefiks</label><br><select id="inv-target-prefix"></select></div>
           <div id="inv-target-suffix-wrap"><label>Sufiks</label><br><select id="inv-target-suffix"></select></div>
@@ -182,7 +182,12 @@
             <input type="number" id="inv-max-depth" min="1" max="8" value="5"
               style="width:64px;background:#1a1a1a;border:1px solid #5a3e1b;color:#e5c97a;border-radius:4px;padding:4px 6px;text-align:center;">
           </div>
-          <div style="align-self:end;">
+        </div>
+        <div class="flex items-center gap-4 flex-wrap" style="border-top:1px solid #3a2a10;padding-top:10px;">
+          <label style="color:#c9952a;font-size:0.85em;">Rodzaj celu:</label>
+          <label style="cursor:pointer;"><input type="radio" name="inv-legendary" value="normal" checked> Zwykły (łączy się ze zwykłymi)</label>
+          <label style="cursor:pointer;color:#d4a430;"><input type="radio" name="inv-legendary" value="legendary"> Legendarny (łączy się tylko z legendarnymi)</label>
+          <div style="margin-left:auto;">
             <button onclick="findInventoryPath()" style="background:#2a1f08;border-color:#c9952a;color:#f5d78e;font-weight:bold;padding:6px 16px;">Znajdź ścieżkę</button>
           </div>
         </div>
