@@ -43,9 +43,9 @@ export function combine(A, B, cat) {
 }
 
 // Build the closure of all composites producible from inventory by repeated combination,
-// ignoring consumption (over-approximation). Returns { set: Map, capped: boolean }.
+// ignoring consumption (over-approximation). Returns { set, capped, timedOut }.
 // Uses frontier-style expansion: each pair is combined only when at least one side is new.
-export function buildReachable(inventory, cat) {
+export function buildReachable(inventory, cat, deadline = Infinity) {
   const reachable = new Map(); // key -> composite
   for (const item of inventory) {
     reachable.set(itemKey(item), { type: item.type, prefix: item.prefix, suffix: item.suffix });
@@ -53,7 +53,9 @@ export function buildReachable(inventory, cat) {
   let frontier = [...reachable.values()];
   let iter = 0;
   let capped = false;
+  let timedOut = false;
   while (frontier.length > 0 && iter < REACH_MAX_ITERS) {
+    if (Date.now() > deadline) { timedOut = true; break; }
     const allItems = [...reachable.values()];
     const newItems = [];
     outer: for (const a of frontier) {
@@ -75,7 +77,7 @@ export function buildReachable(inventory, cat) {
     frontier = newItems;
     iter++;
   }
-  return { set: reachable, capped };
+  return { set: reachable, capped, timedOut };
 }
 
 function pairsForType(targetType, cat) {
@@ -166,6 +168,9 @@ function findInvIndex(target, available, inventory) {
 }
 
 function solve(target, available, K, inventory, cat, ctx) {
+  if (ctx.timedOut) return null;
+  // Cheap-ish deadline check: at most one Date.now() per solve call.
+  if (Date.now() > ctx.deadline) { ctx.timedOut = true; return null; }
   // Base: target is directly in inventory
   const directIdx = findInvIndex(target, available, inventory);
   if (directIdx !== -1) {
@@ -188,9 +193,11 @@ function solve(target, available, K, inventory, cat, ctx) {
   const ranked = rankCandidates(candidates, inventory, available);
 
   for (const [A, B] of ranked) {
+    if (ctx.timedOut) return null;
     for (let K1 = 0; K1 <= K - 1; K1++) {
       const K2 = K - 1 - K1;
       const resA = solve(A, available, K1, inventory, cat, ctx);
+      if (ctx.timedOut) return null;
       if (!resA) continue;
       let availableForB = available;
       if (resA.consumed.size > 0) {
@@ -198,6 +205,7 @@ function solve(target, available, K, inventory, cat, ctx) {
         for (const idx of resA.consumed) availableForB.delete(idx);
       }
       const resB = solve(B, availableForB, K2, inventory, cat, ctx);
+      if (ctx.timedOut) return null;
       if (!resB) continue;
 
       // Concatenate steps with index remapping for resB
@@ -232,7 +240,7 @@ function solve(target, available, K, inventory, cat, ctx) {
   return null;
 }
 
-export function findCraftPath({ cat, inventory, target, maxDepth = 5 }) {
+export async function findCraftPath({ cat, inventory, target, maxDepth = 5, timeoutMs = 6000 }) {
   if (!inventory || inventory.length === 0) return { kind: 'no-inventory' };
 
   // Fast path: target directly in inventory.
@@ -248,7 +256,13 @@ export function findCraftPath({ cat, inventory, target, maxDepth = 5 }) {
     }
   }
 
-  const built = buildReachable(inventory, cat);
+  const deadline = Date.now() + timeoutMs;
+
+  // Yield one tick so the caller's "Searching..." UI can paint before the heavy work starts.
+  await new Promise(r => setTimeout(r, 0));
+
+  const built = buildReachable(inventory, cat, deadline);
+  if (built.timedOut) return { kind: 'timeout' };
   const reachable = built.capped ? null : built.set;
   if (reachable && !reachable.has(itemKey(target))) return { kind: 'unreachable' };
 
@@ -277,13 +291,17 @@ export function findCraftPath({ cat, inventory, target, maxDepth = 5 }) {
     reachable,
     failureCache: new Set(),
     availSig,
+    deadline,
+    timedOut: false,
   };
 
   const allAvailable = new Set();
   for (let i = 0; i < inventory.length; i++) allAvailable.add(i);
 
   for (let K = 0; K <= maxDepth; K++) {
+    if (Date.now() > deadline) return { kind: 'timeout' };
     const res = solve(target, allAvailable, K, inventory, cat, ctx);
+    if (ctx.timedOut) return { kind: 'timeout' };
     if (res) {
       return {
         kind: 'found',
@@ -293,6 +311,8 @@ export function findCraftPath({ cat, inventory, target, maxDepth = 5 }) {
         depth: K,
       };
     }
+    // Yield between depth iterations so the page stays at least minimally responsive.
+    await new Promise(r => setTimeout(r, 0));
   }
   return { kind: 'too-deep' };
 }

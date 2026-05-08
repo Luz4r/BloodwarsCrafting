@@ -78,6 +78,9 @@ function renderResult(result, target, inventoryForCat) {
   if (result.kind === 'too-deep') {
     return `<div class="no-path">Nie znaleziono ścieżki w limicie kroków. Zwiększ limit lub uzupełnij surowce.</div>`;
   }
+  if (result.kind === 'timeout') {
+    return `<div class="no-path">Przekroczono limit czasu wyszukiwania (6 s). Spróbuj zmniejszyć liczbę kroków lub uprość docelowy przedmiot — być może ścieżka nie istnieje, ale przeszukanie całej przestrzeni jest zbyt kosztowne.</div>`;
+  }
 
   const { steps, consumed, depth } = result;
   let html = '';
@@ -187,7 +190,10 @@ function getLegendaryChoice() {
   return radio && radio.value === 'legendary';
 }
 
-export function findInventoryPath() {
+let searchInFlight = false;
+
+export async function findInventoryPath() {
+  if (searchInFlight) return;
   const cat = getCat();
   const hasPref = !!(cat.prefixes && cat.prefixes.length);
   const hasSuff = !!(cat.suffixes && cat.suffixes.length);
@@ -206,17 +212,40 @@ export function findInventoryPath() {
   const maxDepthEl = document.getElementById('inv-max-depth');
   const maxDepth = Math.max(1, Math.min(8, parseInt(maxDepthEl && maxDepthEl.value) || 5));
 
-  const result = findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth });
   const resultEl = document.getElementById('inv-result');
+  const btn = document.getElementById('inv-find-btn');
+  const banner = wantLegendary
+    ? `<div style="color:#d4a430;font-size:0.85em;margin-bottom:10px;">Tryb legendarny — wykorzystywane są tylko ${inventoryForCat.length} legendarne przedmioty z tej kategorii.</div>`
+    : `<div style="color:#7a9a7a;font-size:0.85em;margin-bottom:10px;">Tryb zwykły — wykorzystywane są tylko ${inventoryForCat.length} zwykłe przedmioty z tej kategorii (legendarne pominięte).</div>`;
+
+  // Paint "searching" state immediately, before the heavy work begins.
   if (resultEl) {
-    let banner = '';
-    if (wantLegendary) {
-      banner = `<div style="color:#d4a430;font-size:0.85em;margin-bottom:10px;">Tryb legendarny — wykorzystywane są tylko ${inventoryForCat.length} legendarne przedmioty z tej kategorii.</div>`;
-    } else {
-      banner = `<div style="color:#7a9a7a;font-size:0.85em;margin-bottom:10px;">Tryb zwykły — wykorzystywane są tylko ${inventoryForCat.length} zwykłe przedmioty z tej kategorii (legendarne pominięte).</div>`;
-    }
-    resultEl.innerHTML = banner + renderResult(result, target, inventoryForCat);
+    resultEl.innerHTML = banner + `<div style="color:#c9952a;font-size:0.95em;">⏳ Szukam ścieżki... (limit 6 s)</div>`;
     resultEl.dataset.fresh = '1';
+  }
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'wait';
+  }
+  searchInFlight = true;
+
+  try {
+    const result = await findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth, timeoutMs: 6000 });
+    if (resultEl) {
+      resultEl.innerHTML = banner + renderResult(result, target, inventoryForCat);
+    }
+  } catch (err) {
+    if (resultEl) {
+      resultEl.innerHTML = banner + `<div class="no-path">Błąd wyszukiwania: ${(err && err.message) || err}</div>`;
+    }
+  } finally {
+    searchInFlight = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+    }
   }
 }
 
