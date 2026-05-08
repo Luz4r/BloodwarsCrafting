@@ -1,6 +1,10 @@
 // Inventory-aware composite craft search.
 // State: composite item = { type, prefix, suffix }. prefix/suffix may be '__any__'.
 
+// Single source of truth for the search time budget. UI strings derive their
+// "X s" display from this constant — change this value to change everything.
+export const SEARCH_TIMEOUT_MS = 10000;
+
 const REACH_MAX_ITERS = 12;
 const REACH_MAX_SET = 8000;
 
@@ -242,7 +246,7 @@ function solve(target, available, K, inventory, cat, ctx) {
 
 // When anyType is true, target.type is ignored and any reachable item whose prefix/suffix
 // match the chosen ones counts as a valid result. The shortest such path wins.
-export async function findCraftPath({ cat, inventory, target, maxDepth = 5, timeoutMs = 6000, anyType = false }) {
+export async function findCraftPath({ cat, inventory, target, maxDepth = 5, timeoutMs = SEARCH_TIMEOUT_MS, anyType = false }) {
   if (!inventory || inventory.length === 0) return { kind: 'no-inventory' };
 
   const matches = (item) => anyType

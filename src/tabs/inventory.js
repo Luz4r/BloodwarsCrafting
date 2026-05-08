@@ -1,6 +1,8 @@
 import { getCat, lbl, currentCat } from '../state.js';
 import { parseInventory, itemDisplayName } from '../lib/inventoryParser.js';
-import { findCraftPath } from '../lib/craftSearch.js';
+import { findCraftPath, SEARCH_TIMEOUT_MS } from '../lib/craftSearch.js';
+
+const SEARCH_TIMEOUT_S = Math.round(SEARCH_TIMEOUT_MS / 1000);
 
 const STORAGE_KEY = 'bw_inventory';
 
@@ -79,7 +81,7 @@ function renderResult(result, target, inventoryForCat) {
     return `<div class="no-path">Nie znaleziono ścieżki w limicie kroków. Zwiększ limit lub uzupełnij surowce.</div>`;
   }
   if (result.kind === 'timeout') {
-    return `<div class="no-path">Przekroczono limit czasu wyszukiwania (6 s). Spróbuj zmniejszyć liczbę kroków lub uprość docelowy przedmiot — być może ścieżka nie istnieje, ale przeszukanie całej przestrzeni jest zbyt kosztowne.</div>`;
+    return `<div class="no-path">Przekroczono limit czasu wyszukiwania (${SEARCH_TIMEOUT_S} s). Spróbuj zmniejszyć liczbę kroków lub uprość docelowy przedmiot — być może ścieżka nie istnieje, ale przeszukanie całej przestrzeni jest zbyt kosztowne.</div>`;
   }
 
   const { steps, consumed, depth } = result;
@@ -235,7 +237,7 @@ export async function findInventoryPath() {
 
   // Paint "searching" state immediately, before the heavy work begins.
   if (resultEl) {
-    resultEl.innerHTML = banner + `<div style="color:#c9952a;font-size:0.95em;">⏳ Szukam ścieżki... (limit 6 s)</div>`;
+    resultEl.innerHTML = banner + `<div style="color:#c9952a;font-size:0.95em;">⏳ Szukam ścieżki... (limit ${SEARCH_TIMEOUT_S} s)</div>`;
     resultEl.dataset.fresh = '1';
   }
   if (btn) {
@@ -246,7 +248,7 @@ export async function findInventoryPath() {
   searchInFlight = true;
 
   try {
-    const result = await findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth, timeoutMs: 10000, anyType });
+    const result = await findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth, timeoutMs: SEARCH_TIMEOUT_MS, anyType });
     if (resultEl) {
       const displayTarget = result.target || target;
       resultEl.innerHTML = banner + renderResult(result, displayTarget, inventoryForCat);
