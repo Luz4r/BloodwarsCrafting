@@ -35,6 +35,7 @@
     <button class="tab-btn" onclick="switchTab('forward')">⚗ Wynik Łączenia</button>
     <button class="tab-btn" onclick="switchTab('path')">🗺 Ścieżka Wytwarzania</button>
     <button class="tab-btn" onclick="switchTab('craft')">🎒 Moje Kombinacje</button>
+    <button class="tab-btn" onclick="switchTab('inventory')">📦 Z mojej zbrojowni</button>
   </div>
 
   <div class="card" style="border-radius:0 8px 8px 8px; border-top-color:#c9952a;">
@@ -150,6 +151,44 @@
         </div>
       </div>
       <div id="craft-results"></div>
+    </div>
+
+    <!-- ===== INVENTORY TAB ===== -->
+    <div id="tab-inventory" class="tab-content">
+      <h2>Z mojej zbrojowni</h2>
+      <p class="text-sm mb-4" style="color:#888;">Wklej tekst z gry (Ctrl+A, Ctrl+C w widoku zbrojowni). Wybierz cel — narzędzie znajdzie najkrótszą ścieżkę z dostępnych przedmiotów.</p>
+
+      <div class="card mb-4">
+        <div class="attr-label mb-2">Tekst zbrojowni</div>
+        <textarea id="inv-paste" rows="10"
+          style="width:100%;background:#1a1a1a;border:1px solid #5a3e1b;color:#e5c97a;border-radius:4px;padding:8px;font-family:'Consolas',monospace;font-size:0.85em;"
+          placeholder="Wklej tutaj raw tekst ze zbrojowni..."></textarea>
+        <div class="flex gap-3 mt-3 flex-wrap">
+          <button onclick="loadInventoryFromText(document.getElementById('inv-paste').value)">Wczytaj</button>
+          <button onclick="clearInventory()">Wyczyść</button>
+          <div id="inv-status" style="flex:1;align-self:center;font-size:0.88em;"></div>
+        </div>
+        <div id="inv-detail"></div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="attr-label mb-3">Przedmiot docelowy</div>
+        <div class="flex flex-wrap gap-4">
+          <div id="inv-target-type-wrap"><label>Typ</label><br><select id="inv-target-type"></select></div>
+          <div id="inv-target-prefix-wrap"><label>Prefiks</label><br><select id="inv-target-prefix"></select></div>
+          <div id="inv-target-suffix-wrap"><label>Sufiks</label><br><select id="inv-target-suffix"></select></div>
+          <div style="align-self:end;">
+            <label>Maks. kroków</label><br>
+            <input type="number" id="inv-max-depth" min="1" max="8" value="5"
+              style="width:64px;background:#1a1a1a;border:1px solid #5a3e1b;color:#e5c97a;border-radius:4px;padding:4px 6px;text-align:center;">
+          </div>
+          <div style="align-self:end;">
+            <button onclick="findInventoryPath()" style="background:#2a1f08;border-color:#c9952a;color:#f5d78e;font-weight:bold;padding:6px 16px;">Znajdź ścieżkę</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="inv-result"></div>
     </div>
 
   </div>

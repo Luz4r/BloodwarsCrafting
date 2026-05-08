@@ -7,12 +7,17 @@ import { doReverse, refreshReverse, drillExtendPath, drillSplitPath, drillPathBa
 import { doForward } from './tabs/forward.js';
 import { doPath } from './tabs/path.js';
 import { doCraft } from './tabs/craft.js';
+import { doInventory, loadInventoryFromText, clearInventory, findInventoryPath, initInventory } from './tabs/inventory.js';
 
 // Expose functions on window so HTML onclick attributes work
 window.doReverse = doReverse;
 window.doForward = doForward;
 window.doPath = doPath;
 window.doCraft = doCraft;
+window.doInventory = doInventory;
+window.loadInventoryFromText = loadInventoryFromText;
+window.clearInventory = clearInventory;
+window.findInventoryPath = findInventoryPath;
 
 window.drillExtendPath = drillExtendPath;
 window.drillSplitPath = drillSplitPath;
@@ -83,6 +88,7 @@ window.onCatChange = function () {
   doForward();
   doPath();
   doCraft();
+  doInventory();
 };
 
 window.toggleBlockedItem = function (attr, key) {
@@ -106,6 +112,7 @@ window.switchTab = function (name) {
   else if (name === 'forward') doForward();
   else if (name === 'path') doPath();
   else if (name === 'craft') doCraft();
+  else if (name === 'inventory') doInventory();
 };
 
 // Init
@@ -115,3 +122,5 @@ doReverse();
 doForward();
 doPath();
 doCraft();
+initInventory();
+doInventory();

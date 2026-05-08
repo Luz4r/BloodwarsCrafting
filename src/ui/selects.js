@@ -73,4 +73,11 @@ export function rebuildAllSelects() {
   showEl('craft-suffix-wrap', hasSuff);
   if (hasPref) populateSelect('craft-prefix', cat.prefixes, true, '(dowolny prefiks)');
   if (hasSuff) populateSelect('craft-suffix', cat.suffixes, true, '(dowolny sufiks)');
+
+  // Inventory tab — target selectors
+  populateSelect('inv-target-type', cat.subtypes, false);
+  showEl('inv-target-prefix-wrap', hasPref);
+  showEl('inv-target-suffix-wrap', hasSuff);
+  if (hasPref) populateSelect('inv-target-prefix', cat.prefixes, true, '(brak)');
+  if (hasSuff) populateSelect('inv-target-suffix', cat.suffixes, true, '(brak)');
 }

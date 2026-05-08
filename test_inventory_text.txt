@@ -1,0 +1,391 @@
+BW Team21:09:36
+Konto premium
+---
+Sala tronowa
+Trening
+Plac budowy
+Widok miasta
+Klan
+Siedziba klanu
+---
+Sklep
+Zbrojownia
+Talizmany · 8
+Umagicznienia
+Aukcja
+Studnia Dusz
+---
+Urządź zasadzkę · 10/1
+Idź na wyprawę · 1
+Podróż !
+Polowanie
+Ekspedycja
+Król Wzgórza
+Nowa Arena
+Zadania
+---
+Wiadomości
+Notatki
+Ranking
+Ustawienia
+---
+Napisz do nas
+Tutorial
+Forum
+---
+Wyloguj
+v. 2.24
+Kraina: Moria S13
+Utworzona: 20.01.2026
+Populacja: 764
+Noc mocyDurmstrang
+2/1/6
+Krew	Krew
+24 708 701 l
++11 486 l / h
+Pieniądze	Pieniądze
+65 761 120 PLN
++94 546 PLN / h
+Ludzie	Ludzie
+6 824 411
++11 313 / h
+FAQ | Multikonta | Anty-bot patch II | Tabela kar | Konta operatorów w grze | Co zgłaszamy operatorowi
+	Zdjęto przedmiotów: 7.
+PRZEDMIOTÓW W ZBROJOWNI: 104 / 197 +0  [powiększ]   [ Archiwum zbrojowni ]
+ZDEFINIOWANE ZESTAWY PRZEDMIOTÓW
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+
+
+Zapisz jako zestaw nr 
+-- wybierz
+ZBROJOWNIA KLANOWA
+Czas pożyczki: 10 min. hint
+WCZYTAJ
+ZBROJOWNIA Kliknij aby zmienić widok
+
+Przedmiotów z tej półki nie można sprzedać ani zniszczyć. Przenieś przedmiot na półkę 20 lub jedną z niższych półek, aby to zrobić.	
+19. Random  (ROZWIŃ)
+
+
+Przedmiotów z tej półki nie można sprzedać ani zniszczyć. Przenieś przedmiot na półkę 20 lub jedną z niższych półek, aby to zrobić.	
+18. Główne  (ROZWIŃ)
+
+
+Przedmiotów z tej półki nie można sprzedać ani zniszczyć. Przenieś przedmiot na półkę 20 lub jedną z niższych półek, aby to zrobić.	
+17. dyst  (ROZWIŃ)
+
+
+Przedmiotów z tej półki nie można sprzedać ani zniszczyć. Przenieś przedmiot na półkę 20 lub jedną z niższych półek, aby to zrobić.	
+15. czołg/krew  (ROZWIŃ)
+
+
+Przedmiotów z tej półki nie można sprzedać ani zniszczyć. Przenieś przedmiot na półkę 20 lub jedną z niższych półek, aby to zrobić.	
+13. szczescie  (ROZWIŃ)
+
+
+Przedmiotów z tej półki nie można sprzedać ani zniszczyć. Przenieś przedmiot na półkę 20 lub jedną z niższych półek, aby to zrobić.	
+8. craft ring
+
+Wartość: 2 437 450 PLN 
+Dobry Spaczony Pierścień Mądrości (+3)
+	
+38 40
+
+Dobry Zwierzęcy Pierścień Lisa (+3)
+	
+46 28
+
+Dobry Zwierzęcy Pierścień Urody (+1)
+	
+38 17
+
+Dobra Mściwa Bransoleta Władzy (+1)
+	
+35 12 36
+
+Dobra Zdradziecka Bransoleta Mądrości
+	
+37 11 33
+
+Dobry Mściwy Pierścień Mądrości (+3)
+	
+35 40
+
+Doskonały Słoneczny Sygnet Siły (+5)
+	
+76 19 77
+
+Dobry Przebiegły Sygnet Geniuszu (+1)
+	
+42 8 17
+
+Doskonały Dystyngowany Pierścień Władzy
+	
+54 25
+
+Dobry Złoty Pierścień Młodości (+2)
+	
+36 41
+
+Dobry Miedziany Pierścień Młodości (+2)
+	
+30 39
+
+Dobry Rubinowy Pierścień Szczęścia (+2)
+	
+37 27
+
+Legendarna Dobra Niedźwiedzia Bransoleta Krwi (+1)
+	
+36 10 11 2
+
+Dobry Zdradziecki Pierścień Geniuszu (+2)
+	
+37 36
+
+Legendarny Dobry Tytanowy Pierścień Urody (+3)
+	
+28 32 2
+
+Dobry Przebiegły Pierścień Młodości (+3)
+	
+46 30
+
+Doskonały Słoneczny Pierścień Młodości (+5)
+	
+81 86
+
+Dobra Tytanowa Bransoleta Twardej Skóry
+	
+32 11 37
+
+Legendarny Dobry Gwiezdny Pierścień Młodości
+	
+31 20 2
+
+Dobry Dystyngowany Pierścień Koncentracji
+	
+40 28
+
+Dobry Niedźwiedzi Pierścień Sztuki (+3)
+	
+45 28
+
+Dobra Gwiezdna Bransoleta Młodości (+4)
+	
+54 14 34
+
+Dobry Gwiezdny Sygnet Urody (+3)
+	
+47 9 21
+
+Dobry Diamentowy Pierścień Szaleńca
+	
+34 38
+
+
+Przedmiotów z tej półki nie można sprzedać ani zniszczyć. Przenieś przedmiot na półkę 20 lub jedną z niższych półek, aby to zrobić.	
+7. craft amu
+
+Wartość: 6 040 550 PLN 
+Doskonała Pajęcza Apaszka Celności (+5)
+	
+83 18 82 28
+
+Dobry Spaczony Amulet Występku (+4)
+	
+50 12 52 15 15
+
+Słoneczny Amulet Szczęścia (+4)
+	
+33 6 24 8 8
+
+Legendarny Dobry Słoneczny Krawat Celności
+	
+34 9 32 12 2
+
+Dobry Zwierzęcy Amulet Występku (+3)
+	
+53 9 28 15 15
+
+Dobry Plastikowy Łańcuch Władzy (+2)
+	
+46 12 46 15
+
+Legendarny Dobry Mściwy Krawat Władzy (+5)
+	
+44 12 44 17 2
+
+Dobra Tańcząca Apaszka Mądrości (+3)
+	
+52 10 25 16
+
+Doskonały Słoneczny Krawat Wilkołaka (+5)
+	
+90 21 92 30
+
+Legendarny Dobry Zwierzęcy Naszyjnik Występku
+	
+37 9 19 10 2
+
+Dobry Spaczony Łańcuch Siły (+3)
+	
+49 14 46 16
+
+Dobra Spaczona Apaszka Urody (+2)
+	
+43 9 44 15
+
+Dobry Plastikowy Amulet Siły (+2)
+	
+45 8 45 14 14
+
+Dobry Elastyczny Krawat Występku (+2)
+	
+47 12 26 17
+
+Doskonały Słoneczny Łańcuch Siły (+5)
+	
+82 22 84 28
+
+Dobry Zdradziecki Łańcuch Urody
+	
+44 12 38 13
+
+Dobry Spaczony Krawat Urody (+2)
+	
+44 12 42 17
+
+Dobry Gwiezdny Krawat Celności
+	
+43 11 19 15
+
+Dobry Miedziany Krawat Koncentracji (+3)
+	
+49 13 49 18
+
+Dobry Przebiegły Amulet Urody (+3)
+	
+51 9 23 15 15
+
+Dobry Plastikowy Amulet Siły (+2)
+	
+45 8 45 14 14
+
+Dobry Pajęczy Łańcuch Celności (+4)
+	
+53 14 52 18
+
+Dobry Elastyczny Łańcuch Twardej Skóry (+3)
+	
+52 14 29 16
+
+Dobry Diamentowy Krawat Krwi
+	
+42 11 28 15
+
+Dobry Diamentowy Naszyjnik Celności (+3)
+	
+47 13 43 15
+
+Dobry Czarny Amulet Mądrości (+4)
+	
+53 12 51 15 15
+
+Dobry Archaiczny Amulet Mądrości
+	
+46 7 20 13 13
+
+Dobry Zwierzęcy Krawat Koncentracji (+4)
+	
+65 14 38 19
+
+Dobry Spaczony Krawat Władzy (+1)
+	
+42 12 40 16
+
+Dobry Przebiegły Krawat Urody (+2)
+	
+47 12 22 17
+
+Dobry Zwierzęcy Naszyjnik Celności (+4)
+	
+55 14 28 15
+
+Dobry Gwiezdny Łańcuch Łatwości (+2)
+	
+57 12 31 15
+
+Dobry Mściwy Amulet Mądrości (+2)
+	
+44 8 42 14 14
+
+Dobry Spaczony Łańcuch Sztuki (+2)
+	
+53 12 55 15
+
+Dobry Przebiegły Krawat Siły
+	
+43 11 19 15
+
+Dobry Jastrzębi Amulet Twardej Skóry (+4)
+	
+54 12 53 15 15
+
+Doskonały Słoneczny Amulet Pielgrzyma (+5)
+	
+82 19 82 23 23
+
+Legendarny Dobry Zwierzęcy Amulet Siły (+1)
+	
+39 6 17 11 11 2
+
+Dobry Niedźwiedzi Amulet Szczęścia (+2)
+	
+52 8 14 14 14
+
+
+2. Sell  (ROZWIŃ)
+
+Copyright © 2006-2026 BW Team™       Polityka prywatności
+Aktywne premie czasowe
+  
