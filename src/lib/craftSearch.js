@@ -84,15 +84,31 @@ export function buildReachable(inventory, cat, deadline = Infinity) {
   return { set: reachable, capped, timedOut };
 }
 
+// Precompute single-bit BigInts for each inventory index.
+function buildBits(n) {
+  const bits = new Array(n);
+  let b = 1n;
+  for (let i = 0; i < n; i++) { bits[i] = b; b <<= 1n; }
+  return bits;
+}
+
+function maskToIndices(mask, bits) {
+  const out = [];
+  for (let i = 0; i < bits.length; i++) {
+    if ((mask & bits[i]) !== 0n) out.push(i);
+  }
+  return out;
+}
+
 // Forward search: enumerate items reachable by linear combination from inventory
 // (each step takes the previous result and combines it with one fresh inventory
 // item). Tracks consumption — each result has a real, provable path. Returns
-// Map<itemKey, record> where record = { item, depth, steps, consumed, producedBy }.
+// Map<itemKey, record> where record = { item, depth, steps, consumed, consumedMask, producedBy }.
 //
 // Linear-only: misses non-linear paths like (A+B)+(C+D), but those start at
 // depth 3 and are dwarfed by linear coverage. Polynomial in inventory size,
 // so it's fast even when the AND-OR search would explode.
-function forwardSearchLinear(inventory, cat, maxDepth, deadline) {
+function forwardSearchLinear(inventory, cat, maxDepth, deadline, bits) {
   const best = new Map();
   for (let i = 0; i < inventory.length; i++) {
     const it = inventory[i];
@@ -103,6 +119,7 @@ function forwardSearchLinear(inventory, cat, maxDepth, deadline) {
       depth: 0,
       steps: [],
       consumed: [i],
+      consumedMask: bits[i],
       producedBy: { kind: 'inv', invIdx: i },
     });
   }
@@ -112,9 +129,8 @@ function forwardSearchLinear(inventory, cat, maxDepth, deadline) {
     const newFrontier = [];
     for (const r of frontier) {
       if (Date.now() > deadline) break;
-      const used = new Set(r.consumed);
       for (let j = 0; j < inventory.length; j++) {
-        if (used.has(j)) continue;
+        if ((r.consumedMask & bits[j]) !== 0n) continue;
         const inv = inventory[j];
         const combined = combine(r.item, inv, cat);
         if (!combined) continue;
@@ -136,6 +152,7 @@ function forwardSearchLinear(inventory, cat, maxDepth, deadline) {
           depth: d,
           steps: [...r.steps, newStep],
           consumed: [...r.consumed, j],
+          consumedMask: r.consumedMask | bits[j],
           producedBy: { kind: 'step', stepIdx: r.steps.length },
         };
         best.set(k, rec);
@@ -263,68 +280,78 @@ function candidatePairsFor(target, cat, reachable) {
   return out;
 }
 
-function rankCandidates(candidates, inventory, available) {
-  // Move pairs where A or B is directly in available inventory to the front.
-  const invKeys = new Set();
-  for (const idx of available) invKeys.add(itemKey(inventory[idx]));
+// Pre-rank candidates with a fixed inventory-key heuristic — doesn't depend on
+// which indices are still available, so we can compute it once per target and
+// reuse across every recursive call. Soft heuristic: pairs whose A or B sit in
+// inventory are tried first.
+function rankCandidatesGlobal(candidates, invKeySet) {
   return candidates.slice().sort((p, q) => score(q) - score(p));
   function score([A, B]) {
     let s = 0;
-    if (invKeys.has(itemKey(A))) s += 2;
-    if (invKeys.has(itemKey(B))) s += 2;
+    if (invKeySet.has(itemKey(A))) s += 2;
+    if (invKeySet.has(itemKey(B))) s += 2;
     return s;
   }
 }
 
-function findInvIndex(target, available, inventory) {
-  for (const idx of available) {
-    if (sameItem(inventory[idx], target)) return idx;
+function findInvIndex(target, availMask, ctx) {
+  const indices = ctx.itemToIndices.get(itemKey(target));
+  if (!indices) return -1;
+  for (const idx of indices) {
+    if ((availMask & ctx.bits[idx]) !== 0n) return idx;
   }
   return -1;
 }
 
-function solve(target, available, K, inventory, cat, ctx) {
+function solve(target, availMask, K, inventory, cat, ctx) {
   if (ctx.timedOut) return null;
-  // Cheap-ish deadline check: at most one Date.now() per solve call.
   if (Date.now() > ctx.deadline) { ctx.timedOut = true; return null; }
-  // Base: target is directly in inventory
-  const directIdx = findInvIndex(target, available, inventory);
+
+  // Base case 1: target is directly available in inventory.
+  const directIdx = findInvIndex(target, availMask, ctx);
   if (directIdx !== -1) {
     return {
       steps: [],
-      consumed: new Set([directIdx]),
+      consumedMask: ctx.bits[directIdx],
       producedBy: { kind: 'inv', invIdx: directIdx },
     };
   }
+
+  // Base case 2: a precomputed forward-search path exists for this target,
+  // fits the remaining depth budget, and consumes only currently-available
+  // indices. The forward record was built with full consumption tracking, so
+  // reusing it is provably correct — no fake paths.
+  const fwd = ctx.forwardMap.get(itemKey(target));
+  if (fwd && fwd.depth <= K && (fwd.consumedMask & ~availMask) === 0n) {
+    return {
+      steps: fwd.steps.slice(),
+      consumedMask: fwd.consumedMask,
+      producedBy: fwd.producedBy,
+    };
+  }
+
   if (K <= 0) return null;
 
-  // Memoize "failure with this exact available set" via available-bitmask + targetKey + K.
-  // For inventory > 32 the bitmask approach gets expensive; skip cache then.
-  const cacheKey = ctx.availSig != null
-    ? itemKey(target) + '|' + K + '|' + ctx.availSig(available)
-    : null;
-  if (cacheKey && ctx.failureCache.has(cacheKey)) return null;
+  // Failure cache keyed by target + remaining budget + available mask.
+  const cacheKey = itemKey(target) + '|' + K + '|' + availMask.toString(36);
+  if (ctx.failureCache.has(cacheKey)) return null;
 
-  const candidates = candidatePairsFor(target, cat, ctx.reachable);
-  const ranked = rankCandidates(candidates, inventory, available);
+  // Memoized, pre-ranked candidate pair list for this target.
+  const ranked = ctx.candidatesFor(target);
 
   for (const [A, B] of ranked) {
     if (ctx.timedOut) return null;
     for (let K1 = 0; K1 <= K - 1; K1++) {
       const K2 = K - 1 - K1;
-      const resA = solve(A, available, K1, inventory, cat, ctx);
+      const resA = solve(A, availMask, K1, inventory, cat, ctx);
       if (ctx.timedOut) return null;
       if (!resA) continue;
-      let availableForB = available;
-      if (resA.consumed.size > 0) {
-        availableForB = new Set(available);
-        for (const idx of resA.consumed) availableForB.delete(idx);
-      }
-      const resB = solve(B, availableForB, K2, inventory, cat, ctx);
+      const availForB = availMask & ~resA.consumedMask;
+      const resB = solve(B, availForB, K2, inventory, cat, ctx);
       if (ctx.timedOut) return null;
       if (!resB) continue;
 
-      // Concatenate steps with index remapping for resB
+      // Concatenate steps with index remapping for resB.
       const offset = resA.steps.length;
       const remappedB = resB.steps.map(step => ({
         ...step,
@@ -343,16 +370,16 @@ function solve(target, available, K, inventory, cat, ctx) {
         : resB.producedBy;
       const newStep = { a: A, b: B, result: target, aSource, bSource };
       const steps = [...resA.steps, ...remappedB, newStep];
-      const consumed = new Set([...resA.consumed, ...resB.consumed]);
+      const consumedMask = resA.consumedMask | resB.consumedMask;
       return {
         steps,
-        consumed,
+        consumedMask,
         producedBy: { kind: 'step', stepIdx: steps.length - 1 },
       };
     }
   }
 
-  if (cacheKey) ctx.failureCache.add(cacheKey);
+  ctx.failureCache.add(cacheKey);
   return null;
 }
 
@@ -380,18 +407,21 @@ export async function findCraftPath({ cat, inventory, target, maxDepth = 5, time
   }
 
   const deadline = Date.now() + timeoutMs;
+  const bits = buildBits(inventory.length);
 
   // Yield one tick so the caller's "Searching..." UI can paint before the heavy work starts.
   await new Promise(r => setTimeout(r, 0));
 
   // Phase 1: linear forward search. Polynomial in inventory size, finishes fast.
-  // Two roles: (a) short-circuit return when the target is already producible —
+  // Three roles: (a) short-circuit return when the target is already producible —
   // catches cases where the AND-OR search would otherwise exhaust its budget;
   // (b) source for near-match suggestions on failure — every record carries its
-  // own provable path, so the click handler can render without re-searching.
+  // own provable path, so the click handler can render without re-searching;
+  // (c) extra base case for the AND-OR solve — any subgoal whose forward record
+  // fits the remaining budget and consumed-set constraints resolves instantly.
   const forwardBudget = Math.min(2500, Math.max(500, Math.floor((deadline - Date.now()) / 4)));
   const forwardDeadline = Math.min(deadline, Date.now() + forwardBudget);
-  const forwardMap = forwardSearchLinear(inventory, cat, 3, forwardDeadline);
+  const forwardMap = forwardSearchLinear(inventory, cat, 3, forwardDeadline, bits);
 
   const quick = pickForwardWin(forwardMap, target, anyType);
   if (quick) {
@@ -438,37 +468,44 @@ export async function findCraftPath({ cat, inventory, target, maxDepth = 5, time
     targets = [target];
   }
 
-  // Build availSig if inventory size allows bitmask
-  let availSig = null;
-  if (inventory.length <= 32) {
-    availSig = (set) => {
-      let m = 0;
-      for (const idx of set) m |= (1 << idx);
-      return m.toString(36);
-    };
-  } else if (inventory.length <= 60) {
-    availSig = (set) => {
-      let lo = 0, hi = 0;
-      for (const idx of set) {
-        if (idx < 30) lo |= (1 << idx);
-        else hi |= (1 << (idx - 30));
-      }
-      return lo.toString(36) + '#' + hi.toString(36);
-    };
-  } else {
-    availSig = null;
+  // Inventory-key set for ranking + index map for direct lookups.
+  const invKeySet = new Set();
+  const itemToIndices = new Map();
+  for (let i = 0; i < inventory.length; i++) {
+    const k = itemKey(inventory[i]);
+    invKeySet.add(k);
+    let arr = itemToIndices.get(k);
+    if (!arr) { arr = []; itemToIndices.set(k, arr); }
+    arr.push(i);
+  }
+
+  // Per-search candidate cache: target key -> ranked pair list. The pair list
+  // depends only on target + reachable (both fixed across the search), so we
+  // can reuse it for every recursive call requesting the same target.
+  const candidateCache = new Map();
+  function candidatesFor(t) {
+    const key = itemKey(t);
+    let cached = candidateCache.get(key);
+    if (cached) return cached;
+    cached = rankCandidatesGlobal(candidatePairsFor(t, cat, reachable), invKeySet);
+    candidateCache.set(key, cached);
+    return cached;
   }
 
   const ctx = {
     reachable,
+    forwardMap,
+    bits,
+    itemToIndices,
+    candidatesFor,
     failureCache: new Set(),
-    availSig,
     deadline,
     timedOut: false,
   };
 
-  const allAvailable = new Set();
-  for (let i = 0; i < inventory.length; i++) allAvailable.add(i);
+  // Initial available mask: every inventory bit set.
+  let allAvailableMask = 0n;
+  for (let i = 0; i < inventory.length; i++) allAvailableMask |= bits[i];
 
   for (let K = 0; K <= maxDepth; K++) {
     if (Date.now() > deadline) return { kind: 'timeout', nearMatches: collectNearMatches(forwardMap, target) };
@@ -476,13 +513,13 @@ export async function findCraftPath({ cat, inventory, target, maxDepth = 5, time
       if (ctx.timedOut || Date.now() > deadline) {
         return { kind: 'timeout', nearMatches: collectNearMatches(forwardMap, target) };
       }
-      const res = solve(t, allAvailable, K, inventory, cat, ctx);
+      const res = solve(t, allAvailableMask, K, inventory, cat, ctx);
       if (ctx.timedOut) return { kind: 'timeout', nearMatches: collectNearMatches(forwardMap, target) };
       if (res) {
         return {
           kind: 'found',
           steps: res.steps,
-          consumed: [...res.consumed],
+          consumed: maskToIndices(res.consumedMask, bits),
           producedBy: res.producedBy,
           depth: K,
           target: t,

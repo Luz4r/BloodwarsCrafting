@@ -35,7 +35,7 @@ src/
     storage.js          # blocked items state — persisted in localStorage via 'bw_blocked' key
     labels.js           # text normalization/tokenization + prefix/suffix form expansion (Polish inflection)
     inventoryParser.js  # parse pasted in-game inventory text into composite items
-    craftSearch.js      # inventory-aware composite craft search; exports SEARCH_TIMEOUT_MS, combine(), findCraftPath()
+    craftSearch.js      # inventory-aware composite craft search (BigInt-bitmask AND-OR + linear forward); exports SEARCH_TIMEOUT_MS, combine(), findCraftPath()
   ui/
     selects.js          # populateSelect(), showEl(), rebuildAllSelects()
     blocked.js          # renderBlockedUI() — renders clickable chip UI for blocked path items
@@ -118,5 +118,7 @@ Matrices are symmetric lookup tables: `matrix[A][B]` gives the result of combini
 - Inventory tab persists pasted text + parsed items in localStorage key `bw_inventory`
 - Long-running inventory searches are bounded by `SEARCH_TIMEOUT_MS` in `src/lib/craftSearch.js` (single source of truth — UI strings derive their "X s" display from it)
 - **Legendary rule:** legendary items can only be combined with other legendary items. Inventory-aware features must partition the pool by the legendary flag before searching.
+- **Inventory craft search internals** (`src/lib/craftSearch.js`): the AND-OR `solve()` tracks `available`/`consumed` as **BigInt bitmasks** keyed off precomputed `bits[i]` — not Sets or arrays. Forward-search records (`forwardMap`) double as extended base cases in `solve`: any record whose `consumedMask ⊆ availMask` and `depth ≤ K` is reused directly with its own provable steps. Candidate pair lists are memoized per target via a per-search `candidateCache`. The external API still exposes `consumed: number[]` (converted via `maskToIndices` at the boundary). All three (bitmasks, forward base case, candidate cache) are load-bearing for performance — preserve them when modifying.
+- **Search must never return fake paths.** Every step in a returned path must be the result of a real `combine()` call, and every consumed inventory index must appear at most once across the whole path. The bitmask `consumedMask = resA.consumedMask | resB.consumedMask` and the `availForB = availMask & ~resA.consumedMask` invariant enforce this — don't bypass them.
 - Commit after every major change with a description of what changed
 - After every major change, also review and update this CLAUDE.md file so the project structure, conventions, and patterns documented here stay in sync with the codebase
