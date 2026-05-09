@@ -23,6 +23,8 @@ npm run preview  # preview the production build
 ```
 index.html              # markup only — no inline JS or CSS
 vite.config.js
+.github/workflows/
+  deploy.yml            # GitHub Pages deployment on push to master
 src/
   main.js               # entry point — imports everything, exposes window.* functions for HTML onclick attrs, runs init
   state.js              # currentCat (active category), getCat(), lbl(), setCurrentCat()
@@ -31,15 +33,20 @@ src/
   lib/
     matrix.js           # pure functions: buildInverse(), bfsAllPaths(), MAX_PATHS_DISPLAY
     storage.js          # blocked items state — persisted in localStorage via 'bw_blocked' key
+    labels.js           # text normalization/tokenization + prefix/suffix form expansion (Polish inflection)
+    inventoryParser.js  # parse pasted in-game inventory text into composite items
+    craftSearch.js      # inventory-aware composite craft search; exports SEARCH_TIMEOUT_MS, combine(), findCraftPath()
   ui/
     selects.js          # populateSelect(), showEl(), rebuildAllSelects()
     blocked.js          # renderBlockedUI() — renders clickable chip UI for blocked path items
     render.js           # renderPairsSection(), renderPathSection(), renderCraftSection()
+    drillGraph.js       # SVG path tree for the reverse-tab drill-down ingredient explorer
   tabs/
-    reverse.js          # doReverse() — find ingredient pairs that produce a target item
+    reverse.js          # doReverse() — find ingredient pairs that produce a target item; drill-down explorer
     forward.js          # doForward() — combine two items, show result
     path.js             # doPath() — BFS shortest path from item A to item B
     craft.js            # doCraft() — given my item, show all possible results with every partner
+    inventory.js        # doInventory() — find craft path to a target type using only items from pasted inventory
   styles/
     theme.css           # all custom CSS: .card, .tab-btn, .step, .result-badge, color scheme
 ```
@@ -108,4 +115,8 @@ Matrices are symmetric lookup tables: `matrix[A][B]` gives the result of combini
 - Internal keys are ASCII (no Polish diacritics) — diacritics only in `LABELS` values
 - Results are rendered as HTML strings (template literals) — no virtual DOM
 - Blocked items are stored per-category in localStorage key `bw_blocked`
+- Inventory tab persists pasted text + parsed items in localStorage key `bw_inventory`
+- Long-running inventory searches are bounded by `SEARCH_TIMEOUT_MS` in `src/lib/craftSearch.js` (single source of truth — UI strings derive their "X s" display from it)
+- **Legendary rule:** legendary items can only be combined with other legendary items. Inventory-aware features must partition the pool by the legendary flag before searching.
 - Commit after every major change with a description of what changed
+- After every major change, also review and update this CLAUDE.md file so the project structure, conventions, and patterns documented here stay in sync with the codebase
