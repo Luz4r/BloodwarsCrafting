@@ -1,12 +1,18 @@
 import { getCat, lbl, currentCat } from '../state.js';
 import { parseInventory, itemDisplayName } from '../lib/inventoryParser.js';
-import { findCraftPath, SEARCH_TIMEOUT_MS } from '../lib/craftSearch.js';
+import { findCraftPath, SEARCH_TIMEOUT_MS, itemKey } from '../lib/craftSearch.js';
 
 const SEARCH_TIMEOUT_S = Math.round(SEARCH_TIMEOUT_MS / 1000);
 
 const STORAGE_KEY = 'bw_inventory';
 
 let parsedItems = [];
+
+// Snapshot of the most recent search: lets near-match clicks render the cached
+// path instantly instead of re-running the slow AND-OR search (which often
+// times out on the same combinatorial cliff that produced the near-matches in
+// the first place).
+let cachedNearMatch = null;
 
 function loadStored() {
   try {
@@ -63,6 +69,54 @@ function renderParsedSummary(items) {
   return html;
 }
 
+function renderClickableNearMatch(record) {
+  const item = record.item;
+  const dep = record.depth;
+  const stepLabel = dep === 0 ? 'gotowe' : `${dep} krok(ów)`;
+  // type/prefix/suffix are ASCII keys (no quotes/spaces) — safe to inline in onclick.
+  return `<span
+    onclick="pickInventoryNearMatch('${item.type}','${item.prefix}','${item.suffix}')"
+    title="Kliknij, aby zobaczyć ścieżkę (${stepLabel})"
+    style="cursor:pointer;display:inline-block;padding:4px 6px;margin:2px;border:1px solid #3a2a10;border-radius:6px;background:#15110a;"
+    onmouseover="this.style.background='#241a08';this.style.borderColor='#c9952a';"
+    onmouseout="this.style.background='#15110a';this.style.borderColor='#3a2a10';"
+  >${renderItemBadge(item)} <span style="color:#888;font-size:0.78em;">(${stepLabel})</span></span>`;
+}
+
+function renderNearMatchBucket(label, items, total, expanded = false) {
+  if (!items || items.length === 0) return '';
+  const more = total > items.length ? ` <span style="color:#888;font-size:0.8em;">(pokazano ${items.length} z ${total})</span>` : '';
+  const inner = items.map(renderClickableNearMatch).join('');
+  if (expanded) {
+    return `<div class="attr-section">
+      <div class="attr-label" style="color:#a07030;">${label}${more}</div>
+      <div>${inner}</div>
+    </div>`;
+  }
+  return `<details style="margin-top:10px;">
+    <summary style="cursor:pointer;color:#a07030;font-size:0.9em;">${label} (${total})</summary>
+    <div style="margin-top:6px;">${inner}</div>
+  </details>`;
+}
+
+function renderNearMatches(nearMatches) {
+  if (!nearMatches) return '';
+  const empty = nearMatches.both.length === 0
+    && nearMatches.prefixOnly.length === 0
+    && nearMatches.suffixOnly.length === 0;
+  if (empty) return '';
+
+  let html = `<div class="card" style="border-color:#7a5c2a;margin-top:14px;">
+    <div class="attr-label" style="margin-bottom:6px;">Co możesz wytworzyć z tej zbrojowni</div>
+    <p style="color:#888;font-size:0.82em;margin-bottom:10px;">Każdy przedmiot poniżej ma już sprawdzoną ścieżkę — kliknij, aby ją zobaczyć.</p>`;
+
+  html += renderNearMatchBucket('Te same prefiks i sufiks (różny typ)', nearMatches.both, nearMatches.bothTotal, true);
+  html += renderNearMatchBucket('Pasujący prefiks', nearMatches.prefixOnly, nearMatches.prefixOnlyTotal, false);
+  html += renderNearMatchBucket('Pasujący sufiks', nearMatches.suffixOnly, nearMatches.suffixOnlyTotal, false);
+  html += `</div>`;
+  return html;
+}
+
 function renderSourceLabel(source, steps) {
   if (source.kind === 'inv') {
     return `<span style="color:#7ec87e;font-size:0.78em;">(z zbrojowni)</span>`;
@@ -75,13 +129,16 @@ function renderResult(result, target, inventoryForCat) {
     return `<p style="color:#888;">Brak przedmiotów z tej kategorii w zbrojowni.</p>`;
   }
   if (result.kind === 'unreachable') {
-    return `<div class="no-path">Z aktualnej zbrojowni nie da się wytworzyć tego przedmiotu — brakuje surowców do osiągnięcia tego celu.</div>`;
+    return `<div class="no-path">Z aktualnej zbrojowni nie da się wytworzyć tego przedmiotu — brakuje surowców do osiągnięcia tego celu.</div>`
+      + renderNearMatches(result.nearMatches);
   }
   if (result.kind === 'too-deep') {
-    return `<div class="no-path">Nie znaleziono ścieżki w limicie kroków. Zwiększ limit lub uzupełnij surowce.</div>`;
+    return `<div class="no-path">Nie znaleziono ścieżki w limicie kroków. Zwiększ limit lub uzupełnij surowce.</div>`
+      + renderNearMatches(result.nearMatches);
   }
   if (result.kind === 'timeout') {
-    return `<div class="no-path">Przekroczono limit czasu wyszukiwania (${SEARCH_TIMEOUT_S} s). Spróbuj zmniejszyć liczbę kroków lub uprość docelowy przedmiot — być może ścieżka nie istnieje, ale przeszukanie całej przestrzeni jest zbyt kosztowne.</div>`;
+    return `<div class="no-path">Przekroczono limit czasu wyszukiwania (${SEARCH_TIMEOUT_S} s). Spróbuj zmniejszyć liczbę kroków lub uprość docelowy przedmiot — być może ścieżka nie istnieje, ale przeszukanie całej przestrzeni jest zbyt kosztowne.</div>`
+      + renderNearMatches(result.nearMatches);
   }
 
   const { steps, consumed, depth } = result;
@@ -173,12 +230,14 @@ export function doInventory() {
 export function loadInventoryFromText(rawText) {
   const { items } = parseInventory(rawText);
   parsedItems = items;
+  cachedNearMatch = null;
   saveStored(rawText, items);
   refreshDom();
 }
 
 export function clearInventory() {
   parsedItems = [];
+  cachedNearMatch = null;
   saveStored('', []);
   const ta = document.getElementById('inv-paste');
   if (ta) ta.value = '';
@@ -195,6 +254,49 @@ function getLegendaryChoice() {
 function getAnyTypeChoice() {
   const cb = document.getElementById('inv-any-type');
   return !!(cb && cb.checked);
+}
+
+function bannerFor(wantLegendary, count) {
+  return wantLegendary
+    ? `<div style="color:#d4a430;font-size:0.85em;margin-bottom:10px;">Tryb legendarny — wykorzystywane są tylko ${count} legendarne przedmioty z tej kategorii.</div>`
+    : `<div style="color:#7a9a7a;font-size:0.85em;margin-bottom:10px;">Tryb zwykły — wykorzystywane są tylko ${count} zwykłe przedmioty z tej kategorii (legendarne pominięte).</div>`;
+}
+
+export function pickInventoryNearMatch(type, prefix, suffix) {
+  if (!cachedNearMatch || cachedNearMatch.cat !== currentCat) return;
+  const targetKey = type + '|' + prefix + '|' + suffix;
+  const record = cachedNearMatch.paths.get(targetKey);
+  if (!record) return;
+
+  // Sync selectors so the displayed state reflects the picked target.
+  const typeSel = document.getElementById('inv-target-type');
+  const prefSel = document.getElementById('inv-target-prefix');
+  const sufSel = document.getElementById('inv-target-suffix');
+  const anyTypeCb = document.getElementById('inv-any-type');
+  if (anyTypeCb && anyTypeCb.checked) {
+    anyTypeCb.checked = false;
+    onAnyTypeChange();
+  }
+  if (typeSel) typeSel.value = type;
+  if (prefSel) prefSel.value = prefix;
+  if (sufSel) sufSel.value = suffix;
+
+  // Render the precomputed path directly — no slow search.
+  const inventoryForCat = cachedNearMatch.inventoryForCat;
+  const fauxResult = {
+    kind: 'found',
+    steps: record.steps,
+    consumed: record.consumed.slice(),
+    producedBy: record.producedBy,
+    depth: record.depth,
+    target: record.item,
+  };
+  const resultEl = document.getElementById('inv-result');
+  if (resultEl) {
+    resultEl.innerHTML = bannerFor(cachedNearMatch.wantLegendary, inventoryForCat.length)
+      + renderResult(fauxResult, record.item, inventoryForCat);
+    resultEl.dataset.fresh = '1';
+  }
 }
 
 export function onAnyTypeChange() {
@@ -231,9 +333,7 @@ export async function findInventoryPath() {
 
   const resultEl = document.getElementById('inv-result');
   const btn = document.getElementById('inv-find-btn');
-  const banner = wantLegendary
-    ? `<div style="color:#d4a430;font-size:0.85em;margin-bottom:10px;">Tryb legendarny — wykorzystywane są tylko ${inventoryForCat.length} legendarne przedmioty z tej kategorii.</div>`
-    : `<div style="color:#7a9a7a;font-size:0.85em;margin-bottom:10px;">Tryb zwykły — wykorzystywane są tylko ${inventoryForCat.length} zwykłe przedmioty z tej kategorii (legendarne pominięte).</div>`;
+  const banner = bannerFor(wantLegendary, inventoryForCat.length);
 
   // Paint "searching" state immediately, before the heavy work begins.
   if (resultEl) {
@@ -249,11 +349,27 @@ export async function findInventoryPath() {
 
   try {
     const result = await findCraftPath({ cat, inventory: inventoryForCat, target, maxDepth, timeoutMs: SEARCH_TIMEOUT_MS, anyType });
+
+    // Cache near-match records keyed by composite item key, paired with the
+    // inventory snapshot whose indices the records reference. This is what lets
+    // a click render an instant cached path instead of re-running the search.
+    const paths = new Map();
+    if (result && result.nearMatches) {
+      const all = [
+        ...(result.nearMatches.both || []),
+        ...(result.nearMatches.prefixOnly || []),
+        ...(result.nearMatches.suffixOnly || []),
+      ];
+      for (const r of all) paths.set(itemKey(r.item), r);
+    }
+    cachedNearMatch = { cat: currentCat, wantLegendary, inventoryForCat, paths };
+
     if (resultEl) {
       const displayTarget = result.target || target;
       resultEl.innerHTML = banner + renderResult(result, displayTarget, inventoryForCat);
     }
   } catch (err) {
+    cachedNearMatch = null;
     if (resultEl) {
       resultEl.innerHTML = banner + `<div class="no-path">Błąd wyszukiwania: ${(err && err.message) || err}</div>`;
     }
